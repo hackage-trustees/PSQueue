@@ -234,10 +234,13 @@ alter f k q =
       case f Nothing of
         Nothing -> empty
         Just p  -> singleton k p
-    Single k' p ->
-      case f (if k==k' then Just p else Nothing) of
-        Nothing -> empty
-        Just p' -> singleton k p'
+    Single k' p 
+      | k == k'   ->  case f (Just p) of
+                        Nothing -> empty
+                        Just p' -> singleton k' p'
+      | otherwise ->  case f Nothing of
+                        Nothing -> singleton k' p
+                        Just p' -> insert k p' $ singleton k' p
     tl `Play` tr
       | k <= maxKey tl -> alter f k tl `unsafePlay` tr
       | otherwise      -> tl `unsafePlay` alter f k tr
